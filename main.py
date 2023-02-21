@@ -1,17 +1,31 @@
 import cv2
-import os
+import numpy as np
+import os 
 
 # Getting the file path for both images
-bank_note = os.path.join(os.path.dirname(__file__), 'bank.jpg')
+subject1 = os.path.join(os.path.dirname(__file__), 'Bank.jpg')
 
 # Load the "Banknotes" image
-img = cv2.imread(bank_note)
+img = cv2.imread(subject1)
 
-# Convert the image to grayscale and apply a binary threshold using Otsu's method
-gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-_, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
-# Display the thresholded image
-cv2.imshow("Thresholded image", thresh)
+
+# Define the transformation matrices
+# Translation: move the image 50 pixels to the right and 100 pixels down
+T = np.float32([[1, 0, 50], [0, 1, 100]])
+# Rotation: rotate the image by 30 degrees clockwise around its center
+R = cv2.getRotationMatrix2D((img.shape[1] / 2, img.shape[0] / 2), 30, 1)
+# Scaling: scale the image by a factor of 1.5 along both axes
+S = np.float32([[1.5, 0, 0], [0, 1.5, 0]])
+
+# Apply the transformations to the image
+translated = cv2.warpAffine(img, T, (img.shape[1], img.shape[0]))
+rotated = cv2.warpAffine(img, R, (img.shape[1], img.shape[0]))
+scaled = cv2.warpAffine(img, S, (img.shape[1], img.shape[0]))
+
+# Display the transformed images
+cv2.imshow("Translated image", translated)
+cv2.imshow("Rotated image", rotated)
+cv2.imshow("Scaled image", scaled)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
